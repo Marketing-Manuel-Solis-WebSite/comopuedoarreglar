@@ -7,7 +7,7 @@ export default function Footer() {
 
   const footerLinks = [
     { name: 'INICIO', href: '/' },
-    { name: 'AREAS LEGALES', href: '/areas-legales' },
+    { name: 'AREAS LEGALES', href: '/servicios' },
     { name: 'TESTIMONIALES', href: '/testimonios' },
     { name: 'ABOGADOS', href: '/abogados' },
     { name: 'OFICINAS', href: '/oficinas' },

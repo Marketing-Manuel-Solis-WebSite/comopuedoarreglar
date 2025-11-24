@@ -1,8 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Star, Play } from 'lucide-react'
+import { Star, Play, X } from 'lucide-react'
 import Image from 'next/image'
+
+// Definimos la interfaz para las props del Modal para corregir el error de "any"
+interface VideoModalProps {
+  videoId: string;
+  onClose: () => void;
+}
+
+const FALLBACK_THUMBNAIL = '/testimonials/Residencia_Octavio.png';
 
 const testimonials = [
   {
@@ -11,50 +19,59 @@ const testimonials = [
     case: 'Residencia Permanente',
     rating: 5,
     comment: 'Feliz, sentí que todo lo que perdí cuando ingresé al país, se me devolvió y con un regalo',
-    videoThumbnail: '/testimonials/octavio.jpg',
-    videoUrl: 'https://www.youtube.com/watch?v=cTJ9M5PT-S4',
-  },
-  {
-    id: 2,
-    name: 'María González',
-    case: 'Asilo Político',
-    rating: 5,
-    comment: 'Excelente servicio, muy profesionales y atentos en cada paso del proceso',
-    videoThumbnail: '/testimonials/maria.jpg',
-    videoUrl: '#',
-  },
-  {
-    id: 3,
-    name: 'Juan Pérez',
-    case: 'Visa U',
-    rating: 5,
-    comment: 'Gracias al equipo de Manuel Solís pude obtener mi visa y comenzar una nueva vida',
-    videoThumbnail: '/testimonials/juan.jpg',
-    videoUrl: '#',
+    videoThumbnail: FALLBACK_THUMBNAIL, 
+    videoId: 'cTJ9M5PT-S4', 
   },
 ]
 
-export default function Testimonials() {
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
-  }
-
-  const current = testimonials[currentIndex]
+// Componente de Modal con tipos definidos
+function VideoModal({ videoId, onClose }: VideoModalProps) {
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0&controls=1`;
 
   return (
-    <section id="testimonios" className="py-24 bg-white"> {/* Fondo blanco y más padding */}
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm transition-opacity duration-300"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-11/12 max-w-4xl rounded-xl shadow-2xl overflow-hidden bg-black" 
+        onClick={(e) => e.stopPropagation()} 
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full text-gray-800 hover:text-white hover:bg-[#B2904D] transition-colors duration-300 shadow-lg"
+          aria-label="Cerrar video"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        {/* Eliminado 'wmode' para corregir error de TS */}
+        <iframe
+          src={embedUrl}
+          title="Testimonio de Cliente"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          className="w-full aspect-video min-h-[300px]"
+        ></iframe>
+      </div>
+    </div>
+  );
+}
+
+export default function Testimonials() {
+  const current = testimonials[0]; 
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  const openVideo = () => setIsVideoOpen(true);
+  const closeVideo = () => setIsVideoOpen(false);
+
+  return (
+    <section id="testimonios" className="py-24 bg-white overflow-hidden">
       <div className="container mx-auto px-4">
         
-        {/* TÍTULO CON EFECTO DE MOVIMIENTO/DECORATIVO */}
+        {/* TÍTULO */}
         <div className="flex items-center justify-center mb-16">
-          
-          {/* Elemento Decorativo Izquierdo (Simula dinamismo) */}
+          {/* Elemento Decorativo Izquierdo */}
           <div className="hidden md:block w-16 h-1 bg-[#B2904D] mx-8 transform rotate-6 opacity-70"></div>
           
           <div className="text-center">
@@ -64,98 +81,75 @@ export default function Testimonials() {
             </h2>
           </div>
 
-          {/* Elemento Decorativo Derecho (Simula dinamismo) */}
+          {/* Elemento Decorativo Derecho */}
           <div className="hidden md:block w-16 h-1 bg-[#B2904D] mx-8 transform rotate-[-6deg] opacity-70"></div>
         </div>
 
+        {/* CONTENIDO PRINCIPAL - Sin tarjeta contenedora (shadow box eliminada) */}
         <div className="max-w-6xl mx-auto">
-          {/* Tarjeta principal de testimonio */}
-          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-            <div className="grid md:grid-cols-2">
-              
-              {/* Video Section */}
-              <div className="relative aspect-video md:aspect-auto bg-gray-900 group">
-                <Image
-                  src={current.videoThumbnail}
-                  alt={current.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105" // Efecto sutil al pasar el mouse
-                />
-                
-                {/* Botón de Play (Enlace directo) */}
-                <a
-                  href={current.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute inset-0 flex items-center justify-center"
-                  aria-label="Reproducir video"
+          <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+            
+            {/* SECCIÓN VIDEO/IMAGEN */}
+            <div className="flex justify-center md:justify-end">
+                <div 
+                  className="relative w-full max-w-md aspect-video bg-transparent cursor-pointer group rounded-2xl overflow-hidden"
+                  onClick={openVideo}
                 >
-                  <div className="bg-[#B2904D] rounded-full p-6 transition-all transform hover:scale-110 shadow-xl">
-                    <Play className="w-12 h-12 text-white" fill="white" />
+                  {/* Imagen de Carátula */}
+                  <Image
+                    src={current.videoThumbnail}
+                    alt={current.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    // CAMBIO: object-contain para que la imagen NO se corte
+                    className="object-contain transition-transform duration-700 group-hover:scale-105"
+                  />
+                  
+                  {/* Botón de Play */}
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center"
+                    aria-label="Reproducir video"
+                  >
+                    <div 
+                      className="bg-[#B2904D]/90 rounded-full p-5 transition-all duration-300 transform group-hover:scale-110 shadow-xl backdrop-blur-sm"
+                    >
+                      <Play className="w-10 h-10 text-white ml-1" fill="white" />
+                    </div>
                   </div>
-                </a>
-              </div>
+                </div>
+            </div>
 
-              {/* Content Section */}
-              <div className="p-8 md:p-12 flex flex-col justify-between">
+            {/* SECCIÓN TEXTO */}
+            <div className="flex flex-col justify-center text-center md:text-left">
                 <div>
-                    <h3 className="text-3xl font-bold mb-2 text-[#B2904D]">{current.name}</h3> {/* Nombre en dorado */}
-                    <h4 className="text-xl text-gray-700 font-semibold mb-4">{current.case}</h4>
+                    <h3 className="text-3xl font-bold mb-1 text-[#B2904D]">{current.name}</h3>
+                    <h4 className="text-xl text-gray-600 font-medium mb-4">{current.case}</h4>
 
                     {/* Rating */}
-                    <div className="flex gap-1 mb-6">
+                    <div className="flex gap-1 mb-6 justify-center md:justify-start">
                     {[...Array(current.rating)].map((_, i) => (
                         <Star key={i} className="w-6 h-6 fill-[#B2904D] text-[#B2904D]" />
                     ))}
                     </div>
 
-                    <p className="text-xl text-gray-800 mb-10 italic border-l-4 border-[#B2904D] pl-4 leading-relaxed"> {/* Diseño: Cita con borde dorado */}
+                    {/* Comentario sin borde lateral */}
+                    <p className="text-2xl text-gray-800 italic leading-relaxed font-light">
                     &quot;{current.comment}&quot;
                     </p>
                 </div>
-
-                {/* Navigation */}
-                <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-                  {/* Botón Anterior */}
-                  <button
-                    onClick={prevSlide}
-                    className="p-3 rounded-full bg-[#B2904D] text-white hover:bg-[#9a7a3d] transition-colors shadow-md"
-                    aria-label="Anterior testimonio"
-                  >
-                    <ChevronLeft className="w-6 h-6" />
-                  </button>
-
-                  {/* Puntos de Navegación */}
-                  <div className="flex gap-2">
-                    {testimonials.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentIndex(index)}
-                        className={`w-3 h-3 rounded-full transition-all ${
-                          index === currentIndex
-                            ? 'bg-[#B2904D] w-8' // Punto activo más ancho y en dorado
-                            : 'bg-gray-300 hover:bg-gray-400'
-                        }`}
-                        aria-label={`Ir a testimonio ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-
-                  {/* Botón Siguiente */}
-                  <button
-                    onClick={nextSlide}
-                    className="p-3 rounded-full bg-[#B2904D] text-white hover:bg-[#9a7a3d] transition-colors shadow-md"
-                    aria-label="Siguiente testimonio"
-                  >
-                    <ChevronRight className="w-6 h-6" />
-                  </button>
+                
+                {/* Indicador simple */}
+                <div className="mt-8 flex justify-center md:justify-start">
+                    <div className="w-12 h-1.5 rounded-full bg-[#B2904D] opacity-50"></div>
                 </div>
-              </div>
             </div>
+
           </div>
         </div>
       </div>
+
+      {/* Modal del Video */}
+      {isVideoOpen && <VideoModal videoId={current.videoId} onClose={closeVideo} />}
     </section>
   )
 }

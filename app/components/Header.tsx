@@ -10,23 +10,10 @@ export default function Header() {
 
   const menuItems = [
     { 
-      name: 'OFICINAS', 
-      href: '#oficinas',
-      submenu: [
-        { name: 'Houston', href: '/oficinas/houston' },
-        { name: 'Dallas', href: '/oficinas/dallas' },
-        { name: 'Los Angeles', href: '/oficinas/los-angeles' },
-        { name: 'Harlingen', href: '/oficinas/harlingen' },
-        { name: 'Chicago', href: '/oficinas/chicago' },
-        { name: 'Denver', href: '/oficinas/denver' },
-        { name: 'El Paso', href: '/oficinas/el-paso' },
-        { name: 'Memphis', href: '/oficinas/memphis' },
-        { name: 'Houston Bellaire (SERVICIO EN CHINO)', href: '/oficinas/houston-chinese' },
-      ]
-    },
+      name: 'OFICINAS', href: '/oficinas'},
     { 
       name: 'ÁREAS LEGALES', 
-      href: '#servicios',
+      href: '/servicios',
       submenu: [
         { name: 'Accidentes', href: '/servicios/accidentes' },
         { name: 'Migración', href: '/servicios/migracion' },
@@ -36,7 +23,7 @@ export default function Header() {
       ]
     },
     { name: 'CLIENTES DETENIDOS', href: '/clientes-detenidos' },
-    { name: 'TESTIMONIOS', href: '#testimonios' },
+    { name: 'TESTIMONIOS', href: '/Testimonios' },
     { 
       name: 'ABOGADOS', 
       href: '/abogados',
