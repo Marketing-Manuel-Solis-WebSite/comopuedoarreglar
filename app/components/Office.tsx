@@ -2,16 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Users, ChevronRight, Star, ArrowRight, CheckCircle2, Play, X, Briefcase } from 'lucide-react';
+import { MapPin, Phone, Clock, Star, CheckCircle2, Play, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ContactForm from './ContactForm'; 
-
-// --- COLORES DE MARCA ---
-const COLORS = {
-  gold: '#B2904D',
-  navy: '#002342',
-};
 
 // --- UTILIDADES ---
 const slugify = (text: string) => {
@@ -51,7 +45,7 @@ type OfficeData = {
   attorneys: TeamMember[];
 };
 
-// --- DATA COMPLETA (Sin cambios) ---
+// --- DATA COMPLETA ---
 const offices: OfficeData[] = [
   {
     id: 'houston',
@@ -296,11 +290,11 @@ export default function Offices() {
   }, [selectedId]);
 
   return (
-    <section className="w-full bg-white pb-20" id="oficinas">
+    <section className="w-full bg-white pb-20 overflow-x-hidden" id="oficinas">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* --- Header de Sección --- */}
-        <div className="text-center mb-10 pt-12">
+        <div className="text-center mb-8 pt-8 md:pt-12">
           <motion.h2 
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -309,7 +303,7 @@ export default function Offices() {
             Nuestras Sedes
           </motion.h2>
           <div className="w-24 h-1 bg-[#B2904D] mx-auto rounded-full mb-6"></div>
-          <p className="text-gray-500 max-w-xl mx-auto text-sm md:text-base px-4">
+          <p className="text-gray-500 max-w-xl mx-auto text-sm md:text-base">
             Selecciona una oficina para ver la información detallada, servicios y el equipo legal a tu disposición.
           </p>
         </div>
@@ -320,27 +314,27 @@ export default function Offices() {
           {/* --- 1. Columna Navegación (Sidebar Estilo Premium) --- */}
           <div className="lg:col-span-3">
             <div className="sticky top-24">
-              {/* Contenedor de Tabs Scrollable Horizontal para Móvil */}
-              <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible gap-3 pb-4 lg:pb-0 scrollbar-hide snap-x snap-mandatory px-1">
+              
+              {/* --- LISTA VERTICAL DE OFICINAS (GRID 2 COLUMNAS EN MOVIL) --- */}
+              <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-col lg:gap-3">
                   {offices.map((office) => (
                     <button
                       key={office.id}
                       onClick={() => setSelectedId(office.id)}
                       className={`
-                        flex-shrink-0 snap-center w-[180px] md:w-[220px] lg:w-full
-                        relative group px-4 py-3 lg:px-5 lg:py-4 rounded-lg text-left transition-all duration-300
+                        w-full relative group px-3 py-3 md:px-5 md:py-4 rounded-lg text-left transition-all duration-300
                         flex items-center justify-between
                         ${selectedId === office.id 
                           ? 'bg-[#002342] text-white shadow-xl border-l-4 border-[#B2904D]' 
-                          : 'bg-white border border-gray-100 text-gray-500 hover:bg-gray-50 hover:pl-6'
+                          : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                         }
                       `}
                     >
                       <div className="overflow-hidden">
-                        <span className={`block font-serif font-bold text-base md:text-lg leading-tight truncate ${selectedId === office.id ? 'text-white' : 'text-[#002342]'}`}>
+                        <span className={`block font-serif font-bold text-sm md:text-lg leading-tight truncate ${selectedId === office.id ? 'text-white' : 'text-[#002342]'}`}>
                           {office.city}
                         </span>
-                        <span className={`text-[10px] uppercase tracking-widest mt-1 block ${selectedId === office.id ? 'text-[#B2904D]' : 'text-gray-400'}`}>
+                        <span className={`text-[9px] md:text-[10px] uppercase tracking-widest mt-1 block ${selectedId === office.id ? 'text-[#B2904D]' : 'text-gray-400'}`}>
                           {office.state}
                         </span>
                       </div>
@@ -353,9 +347,6 @@ export default function Offices() {
                     </button>
                   ))}
                </div>
-               <p className="lg:hidden text-center text-xs text-gray-400 mt-1 animate-pulse flex items-center justify-center gap-1">
-                  <ArrowRight size={12} /> Desliza para ver más sedes
-               </p>
             </div>
           </div>
 
@@ -368,19 +359,20 @@ export default function Offices() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-full"
+                className="bg-white rounded-2xl md:rounded-3xl shadow-lg md:shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-full"
               >
                 
                 {/* A. Hero Area (Video/Imagen) */}
-                <div className="relative h-[300px] md:h-[450px] w-full bg-[#002342] overflow-hidden group">
+                {/* Altura controlada para móvil: h-[250px] */}
+                <div className="relative h-[250px] md:h-[450px] w-full bg-[#002342] overflow-hidden group">
                     
                     {/* Video Background */}
                     {activeOffice.videoUrl ? (
                           <video 
                             autoPlay muted loop playsInline
                             onLoadedData={() => setIsVideoLoaded(true)}
-                            // Mobile: scale-170 para llenar pantallas verticales. Desktop: scale-125
-                            className={`absolute inset-0 w-full h-full object-cover scale-[1.7] md:scale-125 transition-opacity duration-1000 ${isVideoLoaded ? 'opacity-70' : 'opacity-0'}`} 
+                            // Ajuste seguro: scale-110 para eliminar bordes, object-cover para llenar
+                            className={`absolute inset-0 w-full h-full object-cover scale-110 transition-opacity duration-1000 ${isVideoLoaded ? 'opacity-70' : 'opacity-0'}`} 
                         >
                             <source src={activeOffice.videoUrl} type="video/mp4" />
                             <source src={activeOffice.videoUrl.replace('.mp4', '.mov')} type="video/quicktime" />
@@ -389,40 +381,37 @@ export default function Offices() {
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
                     )}
 
-                    {/* Overlay Gradient - Más fuerte en mobile para legibilidad */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#002342] via-[#002342]/40 to-transparent opacity-90 md:opacity-80" />
+                    {/* Overlay Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#002342] via-transparent to-transparent opacity-90 md:opacity-80" />
                     
-                    {/* Botón Play */}
+                    {/* Botón Play (Simplificado para móvil) */}
                     {activeOffice.videoUrl && (
-                      <div className="absolute top-4 right-4 md:top-6 md:right-6 z-30">
+                      <div className="absolute top-3 right-3 md:top-6 md:right-6 z-30">
                         <button 
                           onClick={() => setIsVideoOpen(true)}
-                          className="group/play flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/30 h-10 w-10 md:h-12 md:w-12 rounded-full transition-all duration-300 hover:bg-[#B2904D] hover:border-[#B2904D] hover:w-auto hover:px-4 overflow-hidden"
+                          className="flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/30 h-10 w-10 md:h-12 md:w-12 rounded-full hover:bg-[#B2904D] transition-colors"
                         >
-                          <Play size={18} fill="white" className="text-white flex-shrink-0" />
-                          <span className="text-white font-bold text-sm whitespace-nowrap w-0 group-hover/play:w-auto group-hover/play:ml-2 opacity-0 group-hover/play:opacity-100 transition-all duration-300 hidden md:inline-block">
-                            Ver Video
-                          </span>
+                          <Play size={20} fill="white" className="text-white" />
                         </button>
                       </div>
                     )}
 
                     {/* Texto Hero Inferior */}
-                    <div className="absolute bottom-0 left-0 w-full p-6 md:p-12 text-white z-10">
+                    <div className="absolute bottom-0 left-0 w-full p-5 md:p-12 text-white z-10">
                           <motion.div 
-                            initial={{ opacity: 0, y: 20 }} 
+                            initial={{ opacity: 0, y: 10 }} 
                             animate={{ opacity: 1, y: 0 }} 
                             transition={{ delay: 0.2 }}
                           >
-                             <div className="flex flex-wrap items-center gap-3 mb-3 md:mb-4">
-                                <span className="bg-[#B2904D] text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md">
+                             <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <span className="bg-[#B2904D] text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md">
                                     <MapPin size={10} /> {activeOffice.city}, {activeOffice.state}
                                 </span>
                              </div>
-                             <h3 className="text-2xl md:text-5xl font-serif font-bold mb-2 md:mb-3 leading-tight text-white">
+                             <h3 className="text-2xl md:text-5xl font-serif font-bold mb-1 md:mb-3 leading-tight text-white">
                                 {activeOffice.title}
                              </h3>
-                             <p className="text-[#B2904D] font-medium italic text-base md:text-xl max-w-3xl line-clamp-2 md:line-clamp-none">
+                             <p className="text-[#B2904D] font-medium italic text-sm md:text-xl max-w-3xl line-clamp-2 md:line-clamp-none">
                                 "{activeOffice.quote}"
                              </p>
                           </motion.div>
@@ -430,36 +419,37 @@ export default function Offices() {
                 </div>
 
                 {/* B. Cuerpo del Contenido */}
-                <div className="p-6 md:p-12 space-y-8 md:space-y-12">
+                {/* Padding reducido en móvil: p-5 */}
+                <div className="p-5 md:p-12 space-y-8 md:space-y-12">
                     
                     {/* 1. Descripción y Servicios */}
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 md:gap-12">
                         <div>
-                            <p className="text-gray-600 text-base md:text-lg leading-relaxed mb-6 md:mb-8 text-justify">
+                            <p className="text-gray-600 text-sm md:text-lg leading-relaxed mb-6 md:mb-8 text-justify">
                                 {activeOffice.description}
                             </p>
                             
                             {/* Grid de Contacto */}
-                            <div className="space-y-4 bg-gray-50 p-5 rounded-xl md:bg-transparent md:p-0">
-                                <div className="flex items-start gap-4">
+                            <div className="space-y-3 md:space-y-4 bg-gray-50 p-4 rounded-xl md:bg-transparent md:p-0">
+                                <div className="flex items-start gap-3 md:gap-4">
                                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><MapPin size={16}/></div>
                                     <div>
-                                        <p className="text-xs text-gray-400 font-bold uppercase">Dirección</p>
+                                        <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">Dirección</p>
                                         <p className="text-[#002342] font-medium text-sm md:text-base">{activeOffice.address}</p>
                                         <a href={activeOffice.mapLink} target="_blank" className="text-[#B2904D] text-xs font-bold hover:underline mt-1 inline-block">Ver en mapa</a>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 md:gap-4">
                                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><Phone size={16}/></div>
                                     <div>
-                                        <p className="text-xs text-gray-400 font-bold uppercase">Teléfono</p>
+                                        <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">Teléfono</p>
                                         <a href={`tel:${activeOffice.phone}`} className="text-[#002342] font-bold hover:text-[#B2904D] text-sm md:text-base">{activeOffice.phone}</a>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 md:gap-4">
                                     <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><Clock size={16}/></div>
                                     <div>
-                                        <p className="text-xs text-gray-400 font-bold uppercase">Horario</p>
+                                        <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">Horario</p>
                                         <p className="text-[#002342] font-medium text-sm md:text-base">{activeOffice.hours}</p>
                                     </div>
                                 </div>
@@ -467,14 +457,14 @@ export default function Offices() {
                         </div>
 
                         {/* Lista de Servicios */}
-                        <div className="bg-gray-50 rounded-2xl p-6 md:p-8 border border-gray-100">
+                        <div className="bg-gray-50 rounded-xl p-5 md:p-8 border border-gray-100">
                             <h4 className="text-lg md:text-xl font-serif font-bold text-[#002342] mb-4 md:mb-6 flex items-center gap-2">
-                                <Star className="text-[#B2904D]" size={20} fill="#B2904D" /> Servicios en esta sede
+                                <Star className="text-[#B2904D]" size={18} fill="#B2904D" /> Servicios en esta sede
                             </h4>
-                            <ul className="space-y-3 md:space-y-4">
+                            <ul className="space-y-2 md:space-y-4">
                                 {activeOffice.services.map((service, idx) => (
-                                    <li key={idx} className="flex items-center gap-3">
-                                        <CheckCircle2 className="text-[#B2904D] shrink-0" size={18} />
+                                    <li key={idx} className="flex items-center gap-2 md:gap-3">
+                                        <CheckCircle2 className="text-[#B2904D] shrink-0" size={16} />
                                         <span className="text-[#002342] font-bold text-xs md:text-sm tracking-wide">{service}</span>
                                     </li>
                                 ))}
@@ -484,16 +474,16 @@ export default function Offices() {
 
                     <div className="w-full h-px bg-gray-100" />
 
-                    {/* 2. Equipo (Separado: Abogados y Gerentes) */}
+                    {/* 2. Equipo */}
                     <div>
                         {/* Abogados */}
                         {activeOffice.attorneys.length > 0 && (
-                            <div className="mb-12">
-                                <div className="flex items-center gap-3 mb-6 md:mb-8">
+                            <div className="mb-8 md:mb-12">
+                                <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
                                     <div className="w-1 h-6 md:h-8 bg-[#B2904D] rounded-full"></div>
                                     <h4 className="text-xl md:text-2xl font-serif font-bold text-[#002342]">Nuestros Abogados</h4>
                                 </div>
-                                {/* Grid Responsive para equipo: 2 en movil, 3/4 en desktop */}
+                                {/* Grid adaptable: 2 columnas en móvil, 4 en desktop */}
                                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                                     {activeOffice.attorneys.map((person, idx) => (
                                         <Link href={`/abogados/${slugify(person.name)}`} key={idx} className="group block">
@@ -516,7 +506,7 @@ export default function Offices() {
                         {/* Gerentes */}
                         {activeOffice.managers.length > 0 && (
                             <div>
-                                <div className="flex items-center gap-3 mb-6 md:mb-8">
+                                <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
                                     <div className="w-1 h-6 md:h-8 bg-gray-300 rounded-full"></div>
                                     <h4 className="text-xl md:text-2xl font-serif font-bold text-[#002342]">Nuestra Gerencia</h4>
                                 </div>
@@ -535,10 +525,10 @@ export default function Offices() {
                         )}
                     </div>
                     
-                    {/* 3. FORMULARIO (Full Width - Bottom) */}
-                    <div className="mt-6 pt-6 border-t border-gray-100">
+                    {/* 3. FORMULARIO */}
+                    <div className="mt-4 pt-4 md:mt-6 md:pt-6 border-t border-gray-100">
                         <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-xl relative">
-                             <div className="h-2 w-full bg-gradient-to-r from-[#002342] to-[#B2904D]"></div>
+                             <div className="h-2 w-full bg-g radient-to-r from-[#002342] to-[#B2904D]"></div>
                              <div className="contact-form-container">
                                  <ContactForm />
                              </div>

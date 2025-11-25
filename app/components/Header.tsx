@@ -27,10 +27,6 @@ export default function Header() {
     { 
       name: 'ABOGADOS', 
       href: '/abogados',
-      submenu: [
-        { name: 'Manuel Solis', href: '/abogados/manuel-solis' },
-        { name: 'Equipo Legal', href: '/abogados/equipo' },
-      ]
     },
     { name: 'INFORMACIÓN', href: '#recursos', submenu:[
         { name: 'Recursos', href: '/informacion/recursos' },

@@ -26,7 +26,7 @@ export default function About() {
             </div>
 
             <Link
-              href="/testimonios"
+              href="/Testimonios"
               className="inline-block bg-[#B2904D] text-white px-10 py-4 rounded-lg font-semibold text-lg
                 hover:bg-[#9a7a3d] transition-all duration-300 shadow-lg hover:shadow-xl 
                 transform hover:scale-105"
