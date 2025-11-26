@@ -12,14 +12,14 @@ export default function Header() {
     { 
       name: 'OFICINAS', href: '/oficinas'},
     { 
-      name: 'ÁREAS LEGALES', 
-      href: '/servicios',
+      name: 'ÁREAS LEGALES', href: '#servicios',
       submenu: [
         { name: 'Accidentes', href: '/servicios/accidentes' },
-        { name: 'Migración', href: '/servicios/migracion' },
+        { name: 'Migración', href: '/servicios/inmigracion' },
         { name: 'Seguros', href: '/servicios/seguros' },
-        { name: 'Ley Criminal', href: '/servicios/criminal' },
+        { name: 'Ley Criminal', href: '/servicios/ley-criminal' },
         { name: 'Familia', href: '/servicios/familia' },
+        { name: 'Planificación Familiar', href: '/servicios/planificacion' },
       ]
     },
     { name: 'CLIENTES DETENIDOS', href: '/clientes-detenidos' },
