@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, Variants } from 'framer-motion' 
 import { User, Phone, Mail, MessageSquare, CheckCircle2, ShieldCheck, Zap, XCircle } from 'lucide-react'
 import { track } from '@vercel/analytics/react' // 1. Importamos el tracker de Vercel
+import { trackConversion, pushToDataLayer, getUTMData } from '../lib/tracking'
 
 // --- COLORES ---
 const API_URL = '/api/zapier-contact'; 
@@ -152,13 +153,48 @@ function ContactFormContent() {
 
         if (response.ok) {
             // Ejecutar tus pixels de conversión existentes (FB, TikTok, GA)
-            trackConversionEvents(); 
-            
-            // 2. VERCEL ANALYTICS TRACKING (NUEVO)
-            // Se registra solo si la API responde 200 OK
+            trackConversionEvents();
+
+            // 2. VERCEL ANALYTICS TRACKING
             track('Contact Form Submit', {
                 source: 'contact_page',
                 language: lang
+            });
+
+            // 3. DATALAYER PUSH para GTM (Fase 3)
+            pushToDataLayer('form_submit', {
+                event_category: 'conversion',
+                event_label: 'contact_form',
+                form_type: 'consultation_request',
+            });
+
+            // 4. QUALIFIED LEAD — evento personalizado tras validacion exitosa
+            pushToDataLayer('qualified_lead', {
+                event_category: 'conversion',
+                event_label: 'validated_form_lead',
+            });
+
+            // 5. FLIGHT CHECK — registro propio (Fase 4)
+            const utm = getUTMData();
+            trackConversion({
+                type: 'form_submit',
+                source: utmData.utm_source || utm.source,
+                medium: utmData.utm_medium || utm.medium,
+                campaign: utmData.utm_campaign || utm.campaign,
+                domain: typeof window !== 'undefined' ? window.location.hostname : '',
+                timestamp: new Date().toISOString(),
+                label: 'contact_form',
+                page: typeof window !== 'undefined' ? window.location.pathname : '',
+            });
+            trackConversion({
+                type: 'qualified_lead',
+                source: utmData.utm_source || utm.source,
+                medium: utmData.utm_medium || utm.medium,
+                campaign: utmData.utm_campaign || utm.campaign,
+                domain: typeof window !== 'undefined' ? window.location.hostname : '',
+                timestamp: new Date().toISOString(),
+                label: 'validated_form_lead',
+                page: typeof window !== 'undefined' ? window.location.pathname : '',
             });
 
             setSubmitStatus('success');

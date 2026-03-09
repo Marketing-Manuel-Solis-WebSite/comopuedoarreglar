@@ -9,6 +9,7 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-
 import { Outfit } from 'next/font/google'
 import { usePathname } from 'next/navigation'
 import { track } from '@vercel/analytics/react' // 👈 Importamos track
+import { trackConversion, pushToDataLayer, getUTMData } from '../lib/tracking'
 import { officesPhoneMap, DEFAULT_PHONE, DEFAULT_PHONE_LINK } from './officesPhoneMap'
 
 const font = Outfit({ 
@@ -62,16 +63,44 @@ export default function HeaderProfessional() {
     };
   }, [pathname]);
 
-  // --- ⚡️ EVENTO DE RASTREO DE LLAMADA ⚡️ ---
+  // --- EVENTO DE RASTREO DE LLAMADA ---
   const handleCallClick = () => {
-    // Enviamos el evento a Vercel
+    // Vercel Analytics
     track('Call Header Click', {
       phoneNumber: phoneNumber,
       location: 'header_main',
       page: pathname || 'unknown',
       timestamp: new Date().toISOString()
     });
-    console.log(`Event tracked: Call Click on ${phoneNumber}`);
+
+    // DATALAYER PUSH para GTM (Fase 3)
+    pushToDataLayer('phone_click', {
+      event_category: 'conversion',
+      event_label: 'header_phone_button',
+      phone_number: phoneNumber,
+    });
+
+    // Google Analytics (gtag directo)
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'phone_click', {
+        'event_category': 'conversion',
+        'event_label': 'header_phone_button',
+        'phone_number': phoneNumber,
+      });
+    }
+
+    // FLIGHT CHECK — registro propio (Fase 4)
+    const utm = getUTMData();
+    trackConversion({
+      type: 'phone_click',
+      source: utm.source,
+      medium: utm.medium,
+      campaign: utm.campaign,
+      domain: typeof window !== 'undefined' ? window.location.hostname : '',
+      timestamp: new Date().toISOString(),
+      label: 'header_phone_button',
+      page: pathname || '',
+    });
   };
 
   const callText = language === 'es' ? 'Llámanos para una consulta:' : 'Call for a consultation:';
